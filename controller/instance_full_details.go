@@ -25,21 +25,17 @@ func GetInstanceDetails(instance *compute.Instance) (string, string, int, int, i
 		}
 	}
 	cpuCount, memoryMB := extractMachineDetails(instance.MachineType)
-	//fmt.Println(instance.Disks[0].Source)
 	diskSizeGB, err := getDiskSize(project, zone, instance.Disks[0].Source)
 	if err != nil {
 		log.Fatalf("Error getting disk size: %v", err)
 	}
 	pricingInfo := 1
-	//pricingInfo = instance.Scheduling.MinNodeCpus / 100
-	//pricingInfo, err := priceInfo(instance)
 
 	launchTime := instance.CreationTimestamp
 	return cpuPlatform, gpuType, gpuCount, cpuCount, memoryMB, diskSizeGB, float64(pricingInfo), launchTime
 }
 
 func getDiskSize(project, zone, diskURL string) (int, error) {
-	// Create a new Compute Engine API client
 	if diskURL == "" {
 		diskURL = diskURLcreate
 	}
@@ -71,7 +67,6 @@ func extractMachineDetails(machineTypeURL string) (int, int) {
 	if len(matches) == 2 {
 		machineTypeName := matches[1]
 
-		// Extract CPU and memory details from the machine type name
 		re := regexp.MustCompile(`([0-9]+)cpus-([0-9]+)mb`)
 		submatches := re.FindStringSubmatch(machineTypeName)
 

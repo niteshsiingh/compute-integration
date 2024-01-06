@@ -87,14 +87,14 @@ func fetchInfoByMachineType(machineType string) ([]*compute.Instance, error) {
 }
 
 func GetInstanceDetail(c *gin.Context) {
-	id := c.Query("instance_type")
+	id := c.Query("instance_type") //query parameter instance_type
 	result := getInstanceDetail(id)
 	if result != nil {
 		log.Fatal(result)
 	}
 	filter := bson.M{"type": id}
 	var filteredInstances []model.StoreInstance
-	cursor, err := collection.Find(context.TODO(), filter)
+	cursor, err := collection.Find(context.TODO(), filter) //after filtering
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,14 +107,14 @@ func GetInstanceDetail(c *gin.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		filteredInstances = append(filteredInstances, instance)
+		filteredInstances = append(filteredInstances, instance) //store instances of instance_type in filterInstances
 	}
 
 	if err := cursor.Err(); err != nil {
 		log.Fatal(err)
 	}
 	if len(filteredInstances) == 0 {
-		createInstance(model.InstanceData{Type: id})
+		createInstance(model.InstanceData{Type: id}) //if we don't have any instance of instance type then we create one
 	}
 	c.IndentedJSON(http.StatusOK, filteredInstances)
 }

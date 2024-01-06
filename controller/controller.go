@@ -34,6 +34,7 @@ func init() {
 	fmt.Println("Collection instance ready")
 }
 
+// This function returns list of instances under a projectID
 func listComputeInstances(project string) ([]*compute.Instance, error) {
 	ctx := context.Background()
 
@@ -50,6 +51,7 @@ func listComputeInstances(project string) ([]*compute.Instance, error) {
 	return instances.Items, nil
 }
 
+// This only create Compute Engine Service
 func createComputeEngine() (*compute.Service, error) {
 	ctx := context.Background()
 	service, err := compute.NewService(ctx)

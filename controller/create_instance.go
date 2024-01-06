@@ -17,12 +17,12 @@ import (
 )
 
 func CreateInstance(c *gin.Context) {
-	var instanceTyp model.InstanceData
+	var instanceTyp model.InstanceData //this stores type of instance that is going to be created
 	if err := c.BindJSON(&instanceTyp); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := createInstance(instanceTyp)
+	err := createInstance(instanceTyp) //returns err and create a instance
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
@@ -34,10 +34,9 @@ func createInstance(instanceTyp model.InstanceData) error {
 	randomString := strconv.Itoa(randomNumber)
 	instanceType := instanceTyp.Type
 	instanceName := "nitesh-" + instanceType + "-" + randomString
-	// instanceName := instanceTyp.Name
-	// fmt.Println(instanceName)
+	//this will help to create multiple instances such that no clashes occurs
 
-	computeService, err := createComputeEngine()
+	computeService, err := createComputeEngine() //created a compute engine service
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,7 +70,7 @@ func createInstance(instanceTyp model.InstanceData) error {
 				Mode:       "READ_WRITE", //Mode should be READ_WRITE or READ_ONLY
 				Interface:  "SCSI",       //SCSI or NVME - NVME only for SSDs
 				InitializeParams: &compute.AttachedDiskInitializeParams{
-
+					//for no clashes of DiskName I added randomString here too
 					DiskName:    "worker-instance-boot-disk" + randomString,
 					SourceImage: "projects/centos-cloud/global/images/family/centos-7",
 					DiskType:    fmt.Sprintf("projects/%s/zones/%s/diskTypes/pd-ssd", project, zone),
@@ -81,7 +80,7 @@ func createInstance(instanceTyp model.InstanceData) error {
 		},
 	}
 
-	op, err := computeService.Instances.Insert(project, zone, instanc).Do()
+	op, err := computeService.Instances.Insert(project, zone, instanc).Do() //inserted the instance to the project using compute engine
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -121,14 +120,12 @@ func createInstance(instanceTyp model.InstanceData) error {
 		}
 
 	}
-	err = waitForOperation(computeService, op.Name)
+	err = waitForOperation(computeService, op.Name) //wait until operation is not finnished
 	if err != nil {
-		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return err
 	}
 	createdInstance, err := computeService.Instances.Get(project, zone, instanc.Name).Do()
 	if err != nil {
-		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return err
 	}
 
